@@ -2791,6 +2791,7 @@ end;
 
 procedure TfmMain.miEditPasteClick(Sender: TObject);
 begin
+  Clipboard.AsText := StringReplace(Clipboard.AsText, #13, '', [rfReplaceAll]);
   TCocoaTextView(NSScrollView(dbText.Handle).documentView).
     pasteAsPlainText(nil);
   FormatListTitles(True, True);
@@ -2821,6 +2822,7 @@ begin
   stText := StringReplace(stText, #226#128#168, LineEnding, [rfReplaceAll]);
   stText := StringReplace(stText, #226#128#169, LineEnding, [rfReplaceAll]);
   stText := StringReplace(stText, #226#128#139, ' ', [rfReplaceAll]);
+  stText := StringReplace(stText, #13, '', [rfReplaceAll]);
   dbText.Text := stText;
   RenumberFootnotes;
   RenumberList(True);
