@@ -502,6 +502,8 @@ type
     procedure sgTitlesClick(Sender: TObject);
     procedure sgTitlesDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; aState: TGridDrawState);
+    procedure sgTitlesKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
+      );
     procedure sgTitlesMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
     procedure StateChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -1975,6 +1977,16 @@ begin
     sgTitles.Cells[aCol, aRow]);
 end;
 
+procedure TfmMain.sgTitlesKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if ((key = Ord('C')) and (Shift = [ssMeta])) then
+  begin
+    miEditCopyClick(nil);
+  end;
+  key := 0;
+end;
+
 procedure TfmMain.sgTitlesMouseMove(Sender: TObject; Shift: TShiftState; X, Y: integer);
 var
   Row: integer;
@@ -2779,28 +2791,44 @@ end;
 
 procedure TfmMain.miEditCutClick(Sender: TObject);
 begin
-  TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-    cut(nil);
+  if dbText.Visible = True then
+  begin
+    pcPageControl.PageIndex := 0;
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      cut(nil);
+  end;
 end;
 
 procedure TfmMain.miEditCopyClick(Sender: TObject);
 begin
-  TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-    copy_(nil);
+  if dbText.Visible = True then
+  begin
+    pcPageControl.PageIndex := 0;
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      copy_(nil);
+  end;
 end;
 
 procedure TfmMain.miEditPasteClick(Sender: TObject);
 begin
-  Clipboard.AsText := StringReplace(Clipboard.AsText, #13, '', [rfReplaceAll]);
-  TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-    pasteAsPlainText(nil);
-  FormatListTitles(True, True);
+  if dbText.Visible = True then
+  begin
+    pcPageControl.PageIndex := 0;
+    Clipboard.AsText := StringReplace(Clipboard.AsText, #13, '', [rfReplaceAll]);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      pasteAsPlainText(nil);
+    FormatListTitles(True, True);
+  end;
 end;
 
 procedure TfmMain.miEditSelectAllClick(Sender: TObject);
 begin
-  TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-    selectAll(nil);
+  if dbText.Visible = True then
+  begin
+    pcPageControl.PageIndex := 0;
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      selectAll(nil);
+  end;
 end;
 
 procedure TfmMain.miEditFormatTitlesClick(Sender: TObject);
