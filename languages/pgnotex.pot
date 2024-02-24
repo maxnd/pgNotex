@@ -10,12 +10,22 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+#: tfmbookmarks.bndown.caption
+msgctxt "tfmbookmarks.bndown.caption"
+msgid "Down"
+msgstr ""
+
 #: tfmbookmarks.bngoto.caption
 msgid "Go to"
 msgstr ""
 
 #: tfmbookmarks.bnset.caption
 msgid "Set"
+msgstr ""
+
+#: tfmbookmarks.bnup.caption
+msgctxt "tfmbookmarks.bnup.caption"
+msgid "Up"
 msgstr ""
 
 #: tfmbookmarks.caption
@@ -80,7 +90,7 @@ msgid "A free software to manage documents with PostgreSQL"
 msgstr ""
 
 #: tfmcopyright.lbcopyrightname.caption
-msgid "pgNotex 1.4.9"
+msgid "pgNotex 1.4.9.1"
 msgstr ""
 
 #: tfmcopyright.lbok.caption
@@ -1250,7 +1260,7 @@ msgid "Attachment name contains"
 msgstr ""
 
 #: unit1.find6
-msgid "Activity name contains"
+msgid "Activity title contains"
 msgstr ""
 
 #: unit1.find7

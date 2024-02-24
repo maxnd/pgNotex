@@ -3,7 +3,6 @@ object fmMain: TfmMain
   Height = 754
   Top = 103
   Width = 1405
-  ActiveControl = edPassword
   AllowDropFiles = True
   Caption = 'pgNotex'
   ClientHeight = 754
@@ -958,7 +957,7 @@ object fmMain: TfmMain
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.0.0.3'
   object pnStatusBar: TPanel
     Left = 0
     Height = 27
@@ -969,6 +968,7 @@ object fmMain: TfmMain
     BorderStyle = bsSingle
     ClientHeight = 25
     ClientWidth = 1403
+    ParentBackground = False
     TabOrder = 0
     object lbInfo: TLabel
       Left = 13
@@ -1009,6 +1009,7 @@ object fmMain: TfmMain
     BevelOuter = bvNone
     ClientHeight = 717
     ClientWidth = 1405
+    ParentBackground = False
     ParentShowHint = False
     TabOrder = 1
     object pnLeft: TPanel
@@ -1020,6 +1021,7 @@ object fmMain: TfmMain
       BevelOuter = bvNone
       ClientHeight = 532
       ClientWidth = 466
+      ParentBackground = False
       TabOrder = 0
       object spNotes_Sections: TSplitter
         Cursor = crVSplit
@@ -1146,6 +1148,7 @@ object fmMain: TfmMain
       BevelOuter = bvNone
       ClientHeight = 532
       ClientWidth = 360
+      ParentBackground = False
       TabOrder = 1
       object grAttachments: TDBGrid
         Left = 6
@@ -1264,6 +1267,7 @@ object fmMain: TfmMain
       ClientHeight = 180
       ClientWidth = 1405
       Constraints.MinHeight = 180
+      ParentBackground = False
       TabOrder = 2
       Visible = False
       object cbFields: TComboBox
@@ -1279,7 +1283,7 @@ object fmMain: TfmMain
           'Modification date among'
           'Tags equal to'
           'Attachment name contains'
-          'Activity name contains'
+          'Activity title contains'
           'SQL Where clause'
         )
         ParentColor = True
@@ -1295,9 +1299,9 @@ object fmMain: TfmMain
         Width = 290
         Anchors = [akTop, akLeft, akBottom]
         Color = clForm
-        OnKeyDown = edFindKeyDown
         ScrollBars = ssAutoVertical
         TabOrder = 1
+        OnKeyDown = edFindKeyDown
       end
       object grFind: TDBGrid
         Left = 552
@@ -1346,9 +1350,9 @@ object fmMain: TfmMain
         Width = 70
         Anchors = [akLeft, akBottom]
         Caption = 'Find'
-        OnClick = bnFindClick
         TabOrder = 2
         TabStop = False
+        OnClick = bnFindClick
       end
       object grTagsList: TDBGrid
         Left = 339
@@ -1430,7 +1434,7 @@ object fmMain: TfmMain
       TabOrder = 3
       object tsNotes: TTabSheet
         Caption = 'Notes'
-        ClientHeight = 499
+        ClientHeight = 493
         ClientWidth = 557
         object pnTitle: TPanel
           Left = 0
@@ -1441,6 +1445,7 @@ object fmMain: TfmMain
           BevelOuter = bvNone
           ClientHeight = 75
           ClientWidth = 557
+          ParentBackground = False
           TabOrder = 0
           object dbTitle: TDBEdit
             Left = 104
@@ -1491,27 +1496,27 @@ object fmMain: TfmMain
         end
         object pnText: TPanel
           Left = 0
-          Height = 424
+          Height = 418
           Top = 75
           Width = 551
           Align = alClient
           BorderSpacing.Right = 6
           BevelOuter = bvNone
-          ClientHeight = 424
+          ClientHeight = 418
           ClientWidth = 551
           ParentColor = False
           TabOrder = 1
           object sgTitles: TStringGrid
             Cursor = crHandPoint
             Left = 10
-            Height = 389
+            Height = 408
             Top = 0
             Width = 200
             Align = alLeft
             AutoEdit = False
             BorderSpacing.Left = 10
             BorderSpacing.Right = 10
-            BorderSpacing.Bottom = 35
+            BorderSpacing.Bottom = 10
             BorderStyle = bsNone
             Color = clForm
             ColCount = 1
@@ -1538,28 +1543,28 @@ object fmMain: TfmMain
           end
           object dbText: TMemo
             Left = 231
-            Height = 389
+            Height = 408
             Top = 0
             Width = 320
             Align = alClient
             BorderSpacing.Left = 10
-            BorderSpacing.Bottom = 35
+            BorderSpacing.Bottom = 10
             BorderStyle = bsNone
             Color = clForm
             Font.Height = -16
             Font.Name = 'Helvetica'
             HideSelection = False
-            OnChange = dbTextChange
-            OnKeyDown = dbTextKeyDown
-            OnKeyUp = dbTextKeyUp
             ParentFont = False
             ScrollBars = ssAutoVertical
             TabOrder = 0
             WantTabs = True
+            OnChange = dbTextChange
+            OnKeyDown = dbTextKeyDown
+            OnKeyUp = dbTextKeyUp
           end
           object spTitles: TSplitter
             Left = 220
-            Height = 424
+            Height = 418
             Top = 0
             Width = 1
             Beveled = True
@@ -1568,11 +1573,11 @@ object fmMain: TfmMain
       end
       object tsTasks: TTabSheet
         Caption = 'Tasks'
-        ClientHeight = 499
+        ClientHeight = 493
         ClientWidth = 557
         object grTasks: TDBGrid
           Left = 10
-          Height = 252
+          Height = 246
           Top = 10
           Width = 537
           Align = alClient
@@ -1640,12 +1645,13 @@ object fmMain: TfmMain
         object pnTasks: TPanel
           Left = 0
           Height = 222
-          Top = 277
+          Top = 271
           Width = 557
           Align = alBottom
           BevelOuter = bvNone
           ClientHeight = 222
           ClientWidth = 557
+          ParentBackground = False
           TabOrder = 1
           object dbTasks: TDBMemo
             Left = 10
@@ -1667,7 +1673,7 @@ object fmMain: TfmMain
           Cursor = crVSplit
           Left = 0
           Height = 5
-          Top = 272
+          Top = 266
           Width = 557
           Align = alBottom
           Color = clForm
@@ -1712,6 +1718,7 @@ object fmMain: TfmMain
     BorderStyle = bsSingle
     ClientHeight = 284
     ClientWidth = 284
+    ParentBackground = False
     TabOrder = 2
     object edUserName: TEdit
       Left = 24
@@ -1727,9 +1734,9 @@ object fmMain: TfmMain
       Top = 245
       Width = 238
       EchoMode = emPassword
-      OnKeyPress = edPasswordKeyPress
       PasswordChar = '*'
       TabOrder = 2
+      OnKeyPress = edPasswordKeyPress
     end
     object lbUserName: TStaticText
       Left = 24
@@ -3488,7 +3495,6 @@ object fmMain: TfmMain
   end
   object zqAllTasks: TZQuery
     Connection = zcConnection
-    AfterScroll = zqAllTasksAfterScroll
     SQL.Strings = (
       'Select Notebooks.ID as NotebooksID, Sections.ID as SectionsID, '
       'Notes.ID as NotesID, Tasks.ID as TasksID,'

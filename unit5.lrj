@@ -11,5 +11,7 @@
 {"hash":4860802,"name":"tfmbookmarks.bnclear.caption","sourcebytes":[67,108,101,97,114],"value":"Clear"},
 {"hash":22980,"name":"tfmbookmarks.bnset.caption","sourcebytes":[83,101,116],"value":"Set"},
 {"hash":4863637,"name":"tfmbookmarks.bncancel.caption","sourcebytes":[67,108,111,115,101],"value":"Close"},
-{"hash":5117871,"name":"tfmbookmarks.bngoto.caption","sourcebytes":[71,111,32,116,111],"value":"Go to"}
+{"hash":5117871,"name":"tfmbookmarks.bngoto.caption","sourcebytes":[71,111,32,116,111],"value":"Go to"},
+{"hash":1472,"name":"tfmbookmarks.bnup.caption","sourcebytes":[85,112],"value":"Up"},
+{"hash":308958,"name":"tfmbookmarks.bndown.caption","sourcebytes":[68,111,119,110],"value":"Down"}
 ]}

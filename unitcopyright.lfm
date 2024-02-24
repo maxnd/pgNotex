@@ -955,7 +955,7 @@ object fmCopyright: TfmCopyright
   OnKeyDown = FormKeyDown
   Position = poScreenCenter
   ShowInTaskBar = stNever
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.0.0.3'
   object imImagecopyright: TImage
     Left = 25
     Height = 128
@@ -3570,8 +3570,8 @@ object fmCopyright: TfmCopyright
     Left = 172
     Height = 43
     Top = 13
-    Width = 233
-    Caption = 'pgNotex 1.4.9'
+    Width = 258
+    Caption = 'pgNotex 1.4.9.1'
     Font.Color = 4240880
     Font.Height = -36
     Font.Style = [fsBold]

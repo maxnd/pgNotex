@@ -37,6 +37,8 @@ type
   TfmBookmarks = class(TForm)
     bnCancel: TButton;
     bnClear: TButton;
+    bnUp: TButton;
+    bnDown: TButton;
     bnGoTo: TButton;
     bnSet: TButton;
     lbBookmarks: TLabel;
@@ -47,8 +49,10 @@ type
     shBookmarks: TShape;
     procedure bnCancelClick(Sender: TObject);
     procedure bnClearClick(Sender: TObject);
+    procedure bnDownClick(Sender: TObject);
     procedure bnGoToClick(Sender: TObject);
     procedure bnSetClick(Sender: TObject);
+    procedure bnUpClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
@@ -160,6 +164,68 @@ begin
     Cells[4, Row] := '';
     Cells[5, Row] := '';
     Cells[6, Row] := '';
+  end;
+end;
+
+procedure TfmBookmarks.bnUpClick(Sender: TObject);
+var
+  stData: String;
+begin
+  if sgBookmarks.Row > 1 then
+  begin
+    with sgBookmarks do
+    begin
+      stData := Cells[1, Row - 1];
+      Cells[1, Row - 1] := Cells[1, Row];
+      Cells[1, Row] := stData;
+      stData := Cells[2, Row - 1];
+      Cells[2, Row - 1] := Cells[2, Row];
+      Cells[2, Row] := stData;
+      stData := Cells[3, Row - 1];
+      Cells[3, Row - 1] := Cells[3, Row];
+      Cells[3, Row] := stData;
+      stData := Cells[4, Row - 1];
+      Cells[4, Row - 1] := Cells[4, Row];
+      Cells[4, Row] := stData;
+      stData := Cells[5, Row - 1];
+      Cells[5, Row - 1] := Cells[5, Row];
+      Cells[5, Row] := stData;
+      stData := Cells[6, Row - 1];
+      Cells[6, Row - 1] := Cells[6, Row];
+      Cells[6, Row] := stData;
+      Row := Row - 1;
+    end;
+  end;
+end;
+
+procedure TfmBookmarks.bnDownClick(Sender: TObject);
+var
+  stData: String;
+begin
+  if sgBookmarks.Row < 9 then
+  begin
+    with sgBookmarks do
+    begin
+      stData := Cells[1, Row + 1];
+      Cells[1, Row + 1] := Cells[1, Row];
+      Cells[1, Row] := stData;
+      stData := Cells[2, Row + 1];
+      Cells[2, Row + 1] := Cells[2, Row];
+      Cells[2, Row] := stData;
+      stData := Cells[3, Row + 1];
+      Cells[3, Row + 1] := Cells[3, Row];
+      Cells[3, Row] := stData;
+      stData := Cells[4, Row + 1];
+      Cells[4, Row + 1] := Cells[4, Row];
+      Cells[4, Row] := stData;
+      stData := Cells[5, Row + 1];
+      Cells[5, Row + 1] := Cells[5, Row];
+      Cells[5, Row] := stData;
+      stData := Cells[6, Row + 1];
+      Cells[6, Row + 1] := Cells[6, Row];
+      Cells[6, Row] := stData;
+      Row := Row + 1;
+    end;
   end;
 end;
 

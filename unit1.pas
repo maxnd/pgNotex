@@ -534,7 +534,6 @@ type
     procedure miFileUndoClick(Sender: TObject);
     procedure tmAutosaveTimerTimer(Sender: TObject);
     procedure tmTitlesTimerTimer(Sender: TObject);
-    procedure zqAllTasksAfterScroll(DataSet: TDataSet);
     procedure zqAttachmentsAfterDelete(DataSet: TDataSet);
     procedure zqAttachmentsAfterInsert(DataSet: TDataSet);
     procedure zqAttachmentsAfterScroll(DataSet: TDataSet);
@@ -572,6 +571,7 @@ type
     procedure zqTasksBeforeDelete(DataSet: TDataSet);
     procedure zqTasksBeforeInsert(DataSet: TDataSet);
   private
+    function CanMove(stLine: string; stHeader: string): boolean;
     function CleanXML(stXMLText: string): string;
     procedure Connect;
     function FindFont(FamilyName: string; iStyle: smallint): NSFontDescriptor;
@@ -687,7 +687,7 @@ resourcestring
   find3 = 'Modification date among';
   find4 = 'Tags equal to';
   find5 = 'Attachment name contains';
-  find6 = 'Activity name contains';
+  find6 = 'Activity title contains';
   find7 = 'SQL Where clause';
   find8 = 'In the whole database';
   find9 = 'In the current notebook';
@@ -1057,14 +1057,6 @@ begin
     Add(find10);
   end;
   cbSearchRange.ItemIndex := 0;
-  if dbName = '' then
-  begin
-    fmMain.ActiveControl := edDbName;
-  end
-  else
-  begin
-    fmMain.ActiveControl := edPassword;
-  end;
 end;
 
 procedure TfmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -1256,6 +1248,20 @@ procedure TfmMain.FormShow(Sender: TObject);
 begin
   edUserName.Text := userName;
   edDbName.Text := dbName;
+  if dbName = '' then
+  begin
+    if edDbName.Visible = True then
+    begin
+      edDbName.SetFocus;
+    end;
+  end
+  else
+  begin
+    if edPassword.Visible = True then
+    begin
+      edPassword.SetFocus;
+    end;
+  end;
   TCocoaTextView(NSScrollView(dbText.Handle).documentView).
     setRichText(True);
   TCocoaTextView(NSScrollView(dbText.Handle).documentView).
@@ -1463,9 +1469,10 @@ end;
 procedure TfmMain.dbTextKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   iNum: integer = 0;
-  iPos, iTest: integer;
+  iPos, iTest, iLine, i: integer;
   myRect: NSRect;
-  stClip: string;
+  stClip, stHead: string;
+  flCanMove: boolean;
 begin
   if ((zqNotes.RecordCount = 0) and not (ssMeta in Shift)) then
   begin
@@ -1585,6 +1592,120 @@ begin
     key := 0;
   end
   else
+  if ((key = 38) and (Shift = [ssCtrl, ssMeta])) then
+  begin
+    key := 0;
+    if dbText.CaretPos.y >= dbText.Lines.Count - 1 then
+    begin
+      iPos := dbText.SelStart;
+      dbText.Lines.Add('');
+      dbText.SelStart := iPos;
+    end;
+    if (((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) <> '# ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 3) <> '## ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 4) <> '### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 5) <> '#### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 6) <> '##### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 7) <> '###### ')) or
+      (dbText.CaretPos.y = 0)) then
+    begin
+      Exit;
+    end;
+    stHead := UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1,
+      UTF8Pos(' ', dbText.Lines[dbText.CaretPos.Y]));
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      moveToBeginningOfParagraph(nil);
+    iPos := dbText.SelStart;
+    flCanMove := False;
+    for i := dbText.CaretPos.Y - 1 downto 0 do
+    begin
+      if CanMove(UTF8Copy(dbText.Lines[i], 1, UTF8Pos(' ', dbText.Lines[i])),
+        stHead) = True then
+      begin
+        flCanMove := True;
+        Break;
+      end;
+      iPos := iPos - StrToNSString(dbText.Lines[i], True).length - 1;
+    end;
+    iPos := iPos - StrToNSString(dbText.Lines[i], True).length - 1;
+    if flCanMove = True then
+    begin
+      iLine := dbText.CaretPos.Y;
+      dbText.Lines.Move(iLine, i);
+      Inc(i);
+      Inc(iLine);
+      while ((CanMove(UTF8Copy(dbText.Lines[iLine], 1, UTF8Pos(' ',
+          dbText.Lines[iLine])), stHead) = False)  and
+          (iLine <= dbText.Lines.Count - 1)) do
+      begin
+        dbText.Lines.Move(iLine, i);
+        Inc(i);
+        Inc(iLine);
+      end;
+      dbText.SelStart := iPos;
+      FormatListTitles(True, True);
+    end;
+  end
+  else
+  if ((key = 40) and (Shift = [ssCtrl, ssMeta])) then
+  begin
+    key := 0;
+    if dbText.CaretPos.y >= dbText.Lines.Count - 1 then
+    begin
+      iPos := dbText.SelStart;
+      dbText.Lines.Add('');
+      dbText.SelStart := iPos;
+    end;
+    if (((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) <> '# ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 3) <> '## ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 4) <> '### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 5) <> '#### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 6) <> '##### ') and
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 7) <> '###### ')) or
+      (dbText.CaretPos.y >= dbText.Lines.Count - 1)) then
+    begin
+      Exit;
+    end;
+    stHead := UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1,
+      UTF8Pos(' ', dbText.Lines[dbText.CaretPos.Y]));
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      moveToBeginningOfParagraph(nil);
+    iPos := dbText.SelStart;
+    flCanMove := False;
+    for i := dbText.CaretPos.Y + 1 to dbText.Lines.Count - 1 do
+    begin
+      if CanMove(UTF8Copy(dbText.Lines[i], 1, UTF8Pos(' ',
+        dbText.Lines[i])), stHead) = True then
+      begin
+        flCanMove := True;
+        Break;
+      end;
+    end;
+    iPos := iPos + StrToNSString(dbText.Lines[i], True).length + 1;
+    if flCanMove = True then
+    begin
+      Inc(i);
+      while ((CanMove(UTF8Copy(dbText.Lines[i], 1, UTF8Pos(' ',
+          dbText.Lines[i])), stHead) = False) and
+          (i <= dbText.Lines.Count - 1)) do
+      begin
+        iPos := iPos + StrToNSString(dbText.Lines[i], True).length + 1;
+        Inc(i);
+      end;
+      Dec(i);
+      iLine := dbText.CaretPos.Y;
+      dbText.Lines.Move(iLine, i);
+      while ((CanMove(UTF8Copy(dbText.Lines[iLine], 1, UTF8Pos(' ',
+          dbText.Lines[iLine])), stHead) = False) and
+          (iLine <= dbText.Lines.Count - 1)) do
+      begin
+        dbText.Lines.Move(iLine, i);
+      end;
+      dbText.SelStart := iPos;
+      FormatListTitles(True, True);
+    end;
+  end
+  else
   if ((key = 38) and (Shift = [ssAlt, ssMeta])) then
   begin
     if dbText.CaretPos.y > 0 then
@@ -1632,6 +1753,61 @@ begin
         FormatListTitles(True, True);
       end;
       dbTextChange(nil);
+    end;
+    key := 0;
+  end
+  else
+  if ((key = 39) and (Shift = [ssCtrl, ssMeta])) then
+  begin
+    if dbText.CaretPos.y = dbText.Lines.Count then
+    begin
+      iPos := dbText.SelStart;
+      dbText.Lines.Add('');
+      dbText.SelStart := iPos;
+    end;
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '# ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 3) = '## ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 4) = '### ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 5) = '#### ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 6) = '##### ')) then
+      begin
+        iPos := dbText.SelStart;
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+          moveToBeginningOfParagraph(nil);
+        InsText('#');
+        FormatListTitles(True, True);
+        dbText.SelStart := iPos + 1;
+      end
+      else
+      if dbText.Lines[dbText.CaretPos.Y] = '' then
+      begin
+        InsText('# ');
+        FormatListTitles(True, True);
+      end;
+    key := 0;
+  end
+  else
+  if ((key = 37) and (Shift = [ssCtrl, ssMeta])) then
+  begin
+    if dbText.CaretPos.y = dbText.Lines.Count then
+    begin
+      iPos := dbText.SelStart;
+      dbText.Lines.Add('');
+      dbText.SelStart := iPos;
+    end;
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 3) = '## ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 4) = '### ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 5) = '#### ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 6) = '##### ') or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 7) = '###### ')) then
+    begin
+      iPos := dbText.SelStart;
+      TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+        moveToBeginningOfParagraph(nil);
+      TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+        deleteForward(nil);
+      FormatListTitles(True, True);
+      dbText.SelStart := iPos - 1;
     end;
     key := 0;
   end
@@ -2400,11 +2576,38 @@ end;
 
 procedure TfmMain.grLinksGetCellHint(Sender: TObject; Column: TColumn;
   var AText: string);
+var
+  myDataset: TZQuery;
 begin
-  if grLinks.Canvas.TextWidth(Column.Field.AsString) > grLinks.Width then
-  begin
-    AText := Column.Field.AsString;
-  end;
+  if ((zqLinks.RecordCount > 0) and (zqLinksLINK_NOTE.IsNull = False)) then
+    try
+      myDataset := TZQuery.Create(Self);
+      myDataset.Connection := fmMain.zqNotebooks.Connection;
+      myDataset.SQL.Add('Select Notebooks.ID as IDNotebooks,');
+      myDataset.SQL.Add('Sections.ID as IDSections,');
+      myDataset.SQL.Add('Notes.ID as IDNotes,');
+      myDataset.SQL.Add('Notebooks.Title as TitleNotebooks,');
+      myDataset.SQL.Add('Sections.Title as TitleSections,');
+      myDataset.SQL.Add('Notes.Title as TitleNotes');
+      myDataset.SQL.Add('from Notebooks, Sections, Notes');
+      myDataset.SQL.Add('where Notebooks.ID = Sections.ID_Notebooks');
+      myDataset.SQL.Add('and Sections.ID = Notes.ID_Sections');
+      myDataset.SQL.Add('and Notes.ID = ' + zqLinksLINK_NOTE.AsString);
+      myDataSet.Open;
+      if myDataSet.RecordCount > 0 then
+      begin
+        AText := Column.Field.AsString + LineEnding + LineEnding +
+          myDataset.FieldByName('TitleNotebooks').Value + ' ••• ' +
+          myDataset.FieldByName('TitleSections').Value;
+      end
+      else
+      begin
+        AText := Column.Field.AsString;
+      end;
+      myDataset.Close;
+    finally
+      myDataset.Free;
+    end;
 end;
 
 procedure TfmMain.itTimeTimer(Sender: TObject);
@@ -2437,11 +2640,6 @@ begin
   FormatListTitles(True, False);
   tmTitlesTimer.AutoEnabled := False;
   tmTitlesTimer.Enabled := False;
-end;
-
-procedure TfmMain.zqAllTasksAfterScroll(DataSet: TDataSet);
-begin
-
 end;
 
 procedure TfmMain.tmAutosaveTimerTimer(Sender: TObject);
@@ -6551,6 +6749,23 @@ begin
     Result := fdd;
   finally
     ns.Release;
+  end;
+end;
+
+function TfmMain.CanMove(stLine: string; stHeader: string): boolean;
+begin
+  Result := False;
+  if ((stLine = '# ') or
+    (stLine = '## ') or
+    (stLine = '### ') or
+    (stLine = '#### ') or
+    (stLine = '##### ') or
+    (stLine = '###### ')) then
+  begin
+    if UTF8Length(stLine) <= UTF8Length(stHeader) then
+    begin
+      Result := True;
+    end;
   end;
 end;
 

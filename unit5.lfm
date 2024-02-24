@@ -956,7 +956,7 @@ object fmBookmarks: TfmBookmarks
   OnKeyUp = FormKeyUp
   Position = poScreenCenter
   ShowInTaskBar = stNever
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.0.0.3'
   object shBookmarks: TShape
     Left = 0
     Height = 340
@@ -1102,9 +1102,9 @@ object fmBookmarks: TfmBookmarks
         Top = 11
         Width = 75
         Caption = 'Clear'
-        OnClick = bnClearClick
         TabOrder = 1
         TabStop = False
+        OnClick = bnClearClick
       end
       object bnSet: TButton
         Left = 16
@@ -1112,9 +1112,9 @@ object fmBookmarks: TfmBookmarks
         Top = 11
         Width = 75
         Caption = 'Set'
-        OnClick = bnSetClick
         TabOrder = 0
         TabStop = False
+        OnClick = bnSetClick
       end
       object bnCancel: TButton
         Left = 598
@@ -1124,9 +1124,9 @@ object fmBookmarks: TfmBookmarks
         Anchors = [akTop, akRight]
         Caption = 'Close'
         ModalResult = 2
-        OnClick = bnCancelClick
-        TabOrder = 2
+        TabOrder = 4
         TabStop = False
+        OnClick = bnCancelClick
       end
       object bnGoTo: TButton
         Left = 686
@@ -1135,9 +1135,29 @@ object fmBookmarks: TfmBookmarks
         Width = 75
         Anchors = [akTop, akRight]
         Caption = 'Go to'
+        TabOrder = 5
+        TabStop = False
         OnClick = bnGoToClick
+      end
+      object bnUp: TButton
+        Left = 192
+        Height = 32
+        Top = 11
+        Width = 75
+        Caption = 'Up'
+        TabOrder = 2
+        TabStop = False
+        OnClick = bnUpClick
+      end
+      object bnDown: TButton
+        Left = 280
+        Height = 32
+        Top = 11
+        Width = 75
+        Caption = 'Down'
         TabOrder = 3
         TabStop = False
+        OnClick = bnDownClick
       end
     end
   end
