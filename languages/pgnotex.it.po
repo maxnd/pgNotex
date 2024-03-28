@@ -95,7 +95,7 @@ msgid "A free software to manage documents with PostgreSQL"
 msgstr "Un software libero per gestire documenti con PostgreSQL"
 
 #: tfmcopyright.lbcopyrightname.caption
-msgid "pgNotex 1.4.9.1"
+msgid "pgNotex 1.4.9.2"
 msgstr ""
 
 #: tfmcopyright.lbok.caption

@@ -610,6 +610,7 @@ var
   blChangedText: boolean = False;
   blLoadNotes: boolean = True;
   blModNote: boolean = False;
+  stLastDb: String = '';
   iLastNotebook: integer = 0;
   iLastSection: integer = 0;
   iLastNote: integer = 0;
@@ -855,6 +856,7 @@ begin
       clTitle1 := StringToColor(MyIni.ReadString('pgnotex', 'title1', 'clDefault'));
       clTitle2 := StringToColor(MyIni.ReadString('pgnotex', 'title2', 'clDefault'));
       clTitle3 := StringToColor(MyIni.ReadString('pgnotex', 'title3', 'clDefault'));
+      stLastDb := MyIni.ReadString('pgnotex', 'lastdb', '');
       iLastNotebook := MyIni.ReadInteger('pgnotex', 'lastnotebook', 0);
       iLastSection := MyIni.ReadInteger('pgnotex', 'lastsection', 0);
       iLastNote := MyIni.ReadInteger('pgnotex', 'lastnote', 0);
@@ -1138,6 +1140,10 @@ begin
     else
     begin
       MyIni.WriteInteger('pgnotex', 'autosave', 0);
+    end;
+    if stLastDb <> '' then
+    begin
+      MyIni.WriteString('pgnotex', 'lastdb', stLastDb);
     end;
     if iLastNotebook > 0 then
     begin
@@ -3015,7 +3021,10 @@ begin
     Clipboard.AsText := StringReplace(Clipboard.AsText, #13, '', [rfReplaceAll]);
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).
       pasteAsPlainText(nil);
-    FormatListTitles(True, True);
+    if UTF8CocoaPos('# ', Clipboard.AsText) > 0 then
+    begin
+      FormatListTitles(True, True);
+    end;
   end;
 end;
 
@@ -5133,6 +5142,7 @@ procedure TfmMain.Disconnect;
 begin
   if zcConnection.Connected = True then
   begin
+    stLastDb := zcConnection.Database;
     iLastNotebook := zqNotebooksID.Value;
     iLastSection := zqSectionsID.Value;
     iLastNote := zqNotesID.Value;
@@ -5353,9 +5363,12 @@ begin
   miNotesFind.Enabled := True;
   miToolsShowEditor.Enabled := True;
   blLoadNotes := False;
-  zqNotebooks.Locate('ID', iLastNotebook, []);
-  zqSections.Locate('ID', iLastSection, []);
-  zqNotes.Locate('ID', iLastNote, []);
+  if stLastDb = zcConnection.Database then
+  begin
+    zqNotebooks.Locate('ID', iLastNotebook, []);
+    zqSections.Locate('ID', iLastSection, []);
+    zqNotes.Locate('ID', iLastNote, []);
+  end;
   blLoadNotes := True;
   zqNotesAfterScroll(nil);
   pcPageControl.ActivePageIndex := 0;
