@@ -1,0 +1,450 @@
+object fmOptions: TfmOptions
+  Left = 664
+  Height = 557
+  Top = 273
+  Width = 547
+  BorderIcons = []
+  BorderStyle = bsDialog
+  Caption = 'Options'
+  ClientHeight = 557
+  ClientWidth = 547
+  Color = clForm
+  KeyPreview = True
+  Menu = mmMenuModal
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  Position = poScreenCenter
+  ShowInTaskBar = stNever
+  LCLVersion = '3.0.0.3'
+  object cbStFonts: TComboBox
+    Left = 43
+    Height = 20
+    Top = 48
+    Width = 218
+    ItemHeight = 26
+    Style = csDropDownList
+    TabOrder = 0
+    TabStop = False
+    Text = '0'
+    OnChange = cbStFontsChange
+  end
+  object edStSize: TEdit
+    Left = 43
+    Height = 22
+    Top = 186
+    Width = 50
+    NumbersOnly = True
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 6
+    Text = '12'
+  end
+  object lbStSize: TLabel
+    Left = 43
+    Height = 16
+    Top = 162
+    Width = 108
+    Caption = 'Font size of notes'
+    ParentColor = False
+  end
+  object bnStFontColorMod: TButton
+    Left = 43
+    Height = 36
+    Top = 71
+    Width = 216
+    Caption = 'Font color'
+    TabOrder = 2
+    TabStop = False
+    OnClick = bnStFontColorModClick
+  end
+  object lnStFonts: TLabel
+    Left = 43
+    Height = 16
+    Top = 24
+    Width = 176
+    Caption = 'Font name of notes and titles'
+    ParentColor = False
+  end
+  object edServer: TEdit
+    Left = 344
+    Height = 22
+    Top = 349
+    Width = 104
+    ParentColor = True
+    TabOrder = 14
+    Text = 'localhost'
+  end
+  object lbServer: TLabel
+    Left = 344
+    Height = 16
+    Top = 329
+    Width = 39
+    Caption = 'Server'
+    ParentColor = False
+  end
+  object bnClose: TButton
+    Left = 437
+    Height = 30
+    Top = 508
+    Width = 75
+    Anchors = [akRight, akBottom]
+    Caption = 'OK'
+    TabOrder = 15
+    TabStop = False
+    OnClick = bnCloseClick
+  end
+  object edStSizeTitles: TEdit
+    Left = 188
+    Height = 22
+    Top = 185
+    Width = 50
+    NumbersOnly = True
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 13
+    Text = '10'
+  end
+  object lbStSizeTitles: TLabel
+    Left = 188
+    Height = 16
+    Top = 162
+    Width = 104
+    Caption = 'Font size of titles'
+    ParentColor = False
+  end
+  object edPort: TEdit
+    Left = 459
+    Height = 22
+    Top = 349
+    Width = 53
+    NumbersOnly = True
+    ParentColor = True
+    TabOrder = 22
+    Text = '0'
+  end
+  object edFBLibPath: TEdit
+    Left = 43
+    Height = 22
+    Top = 349
+    Width = 289
+    ParentColor = True
+    TabOrder = 20
+    Text = '/Library/PostgreSQL/16/lib/libpq.5.dylib'
+  end
+  object lbFBLibPath: TLabel
+    Left = 43
+    Height = 16
+    Top = 329
+    Width = 137
+    Caption = 'Postgresql library path'
+    ParentColor = False
+  end
+  object edStSizePlus: TButton
+    Left = 103
+    Height = 21
+    Top = 187
+    Width = 24
+    Caption = '+'
+    TabOrder = 9
+    TabStop = False
+    OnClick = edStSizePlusClick
+  end
+  object edStSizeLess: TButton
+    Left = 131
+    Height = 21
+    Top = 187
+    Width = 24
+    Caption = '-'
+    TabOrder = 27
+    TabStop = False
+    OnClick = edStSizeLessClick
+  end
+  object edStSizeTitlesPlus: TButton
+    Left = 248
+    Height = 21
+    Top = 186
+    Width = 24
+    Caption = '+'
+    TabOrder = 28
+    TabStop = False
+    OnClick = edStSizeTitlesPlusClick
+  end
+  object edStSizeTitlesLess: TButton
+    Left = 276
+    Height = 21
+    Top = 186
+    Width = 24
+    Caption = '-'
+    TabOrder = 12
+    TabStop = False
+    OnClick = edStSizeTitlesLessClick
+  end
+  object bnStFontTitle1ColorMod: TButton
+    Left = 294
+    Height = 36
+    Top = 71
+    Width = 216
+    Caption = 'Titles 1 color'
+    TabOrder = 3
+    TabStop = False
+    OnClick = bnStFontTitle1ColorModClick
+  end
+  object bnStFontColorDef: TButton
+    Left = 294
+    Height = 36
+    Top = 40
+    Width = 218
+    Caption = 'Default colors'
+    TabOrder = 1
+    TabStop = False
+    OnClick = bnStFontColorDefClick
+  end
+  object lbPort: TLabel
+    Left = 459
+    Height = 16
+    Top = 329
+    Width = 25
+    Caption = 'Port'
+    ParentColor = False
+  end
+  object lbPanOptions: TLabel
+    Left = 43
+    Height = 16
+    Top = 389
+    Width = 112
+    Caption = 'Options of Pandoc'
+    ParentColor = False
+  end
+  object edPanOptions: TEdit
+    Left = 43
+    Height = 22
+    Top = 409
+    Width = 289
+    ParentColor = True
+    TabOrder = 23
+    Text = '+footnotes+inline_notes'
+  end
+  object edPanOutput: TEdit
+    Left = 344
+    Height = 22
+    Top = 469
+    Width = 168
+    ParentColor = True
+    TabOrder = 26
+    Text = '.docx'
+  end
+  object lbPanOutput: TLabel
+    Left = 344
+    Height = 16
+    Top = 449
+    Width = 64
+    Caption = 'Output file'
+    ParentColor = False
+  end
+  object lbPanTemplate: TLabel
+    Left = 45
+    Height = 16
+    Top = 449
+    Width = 56
+    Caption = 'Template'
+    ParentColor = False
+  end
+  object edPanTemplate: TEdit
+    Left = 45
+    Height = 22
+    Top = 469
+    Width = 289
+    ParentColor = True
+    TabOrder = 25
+    Text = 'word-template.docx'
+  end
+  object lbPanPath: TLabel
+    Left = 344
+    Height = 16
+    Top = 389
+    Width = 92
+    Caption = 'Path of Pandoc'
+    ParentColor = False
+  end
+  object edPanPath: TEdit
+    Left = 344
+    Height = 22
+    Top = 409
+    Width = 168
+    ParentColor = True
+    TabOrder = 24
+    Text = '/usr/local/bin/'
+  end
+  object cbNumTitles: TCheckBox
+    Left = 43
+    Height = 18
+    Top = 288
+    Width = 103
+    Caption = 'Number titles'
+    TabOrder = 19
+    TabStop = False
+    OnClick = cbNumTitlesClick
+  end
+  object edMaxSize: TEdit
+    Left = 344
+    Height = 22
+    Top = 186
+    Width = 104
+    NumbersOnly = True
+    ParentColor = True
+    TabOrder = 16
+    Text = '120000'
+    OnChange = edMaxSizeChange
+    OnKeyDown = edMaxSizeKeyDown
+  end
+  object lbMaxSize: TLabel
+    Left = 344
+    Height = 16
+    Top = 162
+    Width = 159
+    Caption = 'Max number of characters'
+    ParentColor = False
+  end
+  object cbAutosave: TCheckBox
+    Left = 344
+    Height = 18
+    Top = 288
+    Width = 130
+    Caption = 'Save every minute'
+    TabOrder = 21
+    TabStop = False
+    OnClick = cbAutosaveClick
+  end
+  object bnStFontTitle2ColorMod: TButton
+    Left = 43
+    Height = 36
+    Top = 104
+    Width = 216
+    Caption = 'Titles 2 -6 color'
+    TabOrder = 4
+    TabStop = False
+    OnClick = bnStFontTitle2ColorModClick
+  end
+  object bnStFontMarkerColorMod: TButton
+    Left = 294
+    Height = 36
+    Top = 104
+    Width = 216
+    Caption = 'Markers color'
+    TabOrder = 5
+    TabStop = False
+    OnClick = bnStFontMarkerColorModClick
+  end
+  object edLineSpacing: TEdit
+    Left = 43
+    Height = 22
+    Top = 247
+    Width = 50
+    NumbersOnly = True
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 17
+    Text = '12'
+  end
+  object lbLineSpacing: TLabel
+    Left = 43
+    Height = 16
+    Top = 223
+    Width = 76
+    Caption = 'Line spacing'
+    ParentColor = False
+  end
+  object edParSpacing: TEdit
+    Left = 188
+    Height = 22
+    Top = 246
+    Width = 50
+    NumbersOnly = True
+    ParentColor = True
+    ReadOnly = True
+    TabOrder = 18
+    Text = '10'
+  end
+  object lbParSpacing: TLabel
+    Left = 188
+    Height = 16
+    Top = 223
+    Width = 113
+    Caption = 'Paragraph spacing'
+    ParentColor = False
+  end
+  object edLineSpacingPlus: TButton
+    Left = 103
+    Height = 21
+    Top = 248
+    Width = 24
+    Caption = '+'
+    TabOrder = 7
+    TabStop = False
+    OnClick = edLineSpacingPlusClick
+  end
+  object edLineSpacingLess: TButton
+    Left = 131
+    Height = 21
+    Top = 248
+    Width = 24
+    Caption = '-'
+    TabOrder = 8
+    TabStop = False
+    OnClick = edLineSpacingLessClick
+  end
+  object edParSpacingPlus: TButton
+    Left = 248
+    Height = 21
+    Top = 247
+    Width = 24
+    Caption = '+'
+    TabOrder = 10
+    TabStop = False
+    OnClick = edParSpacingPlusClick
+  end
+  object edParSpacingLess: TButton
+    Left = 276
+    Height = 21
+    Top = 247
+    Width = 24
+    Caption = '-'
+    TabOrder = 11
+    TabStop = False
+    OnClick = edParSpacingLessClick
+  end
+  object cdColorDialog: TColorDialog
+    Title = 'Select a color'
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    Left = 256
+    Top = 48
+  end
+  object mmMenuModal: TMainMenu
+    Left = 96
+    Top = 56
+  end
+end
