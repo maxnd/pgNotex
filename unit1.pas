@@ -407,7 +407,7 @@ type
     procedure bnFindClick(Sender: TObject);
     procedure dbTasksChange(Sender: TObject);
     procedure dbTasksContextPopup(Sender: TObject; MousePos: TPoint;
-      var Handled: Boolean);
+      var Handled: boolean);
     procedure dbTasksExit(Sender: TObject);
     procedure dbTasksKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure dbTextChange(Sender: TObject);
@@ -637,6 +637,9 @@ var
   pandocTemplate: string = 'word-template.docx';
   pandocOutput: string = '.docx';
   iEndHeading: integer = -1;
+  stFontMono: string = 'Menlo';
+  iIndent: integer = 10;
+
 
 resourcestring
 
@@ -1488,6 +1491,7 @@ var
   rng: NSRange;
   stClip, stHead: string;
   flCanMove: boolean;
+  par: NSMutableParagraphStyle;
 begin
   if ((zqNotes.RecordCount = 0) and not (ssMeta in Shift)) then
   begin
@@ -1752,9 +1756,9 @@ begin
         moveToBeginningOfParagraph(nil);
       Clipboard.AsText := stClip;
       if (((TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 1), iTest) =
-        True) and (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 2, 2) = '. ')) or
+        True) and (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 2, 2) = '.' + #9)) or
         ((TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2), iTest) =
-        True) and (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 3, 2) = '. '))) then
+        True) and (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 3, 2) = '.' + #9))) then
       begin
         RenumberList(False);
       end;
@@ -1893,27 +1897,34 @@ begin
   if key = 13 then
   begin
     if ((dbText.SelStart = StrToNSString(dbText.Text, True).length) and
-      ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '* ') or
-      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '• ') or
-      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '- ') or
-      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '+ ') or
+      ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '*' + #9) or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '•' + #9) or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '-' + #9) or
+      (UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 2) = '+' + #9) or
       (TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1,
-      UTF8CocoaPos('. ', dbText.Lines[dbText.CaretPos.Y - 1]) - 1), iNum) = True)))
+      UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y - 1]) - 1), iNum) = True)))
     then
     begin
       InsText(LineEnding);
       dbText.SelStart := dbText.SelStart - 1;
     end;
-    if ((dbText.Lines[dbText.CaretPos.Y] = '* ') or
-      (dbText.Lines[dbText.CaretPos.Y] = '• ') or
-      (dbText.Lines[dbText.CaretPos.Y] = '- ') or
-      (dbText.Lines[dbText.CaretPos.Y] = '+ ')) then
+    if ((dbText.Lines[dbText.CaretPos.Y] = '*' + #9) or
+      (dbText.Lines[dbText.CaretPos.Y] = '•' + #9) or
+      (dbText.Lines[dbText.CaretPos.Y] = '-' + #9) or
+      (dbText.Lines[dbText.CaretPos.Y] = '+' + #9)) then
     begin
       rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
         textStorage.string_.paragraphRangeForRange(TCocoaTextView(
         NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
       TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
         setTextColor_range(ColorToNSColor(dbText.Font.Color), rng);
+      par := GetWritePara(TCocoaTextView(
+        NSScrollView(dbText.Handle).documentView).textStorage, 1);
+      par.setFirstLineHeadIndent(0);
+      par.setHeadIndent(0);
+      TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+        textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+        par, rng);
       TCocoaTextView(NSScrollView(dbText.Handle).documentView).
         selectParagraph(nil);
       TCocoaTextView(NSScrollView(dbText.Handle).documentView).
@@ -1922,79 +1933,86 @@ begin
       Key := 0;
     end
     else
-    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '* ') and
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '*' + #9) and
       (StrToNSString(dbText.Lines[dbText.CaretPos.Y], True).length > 2) and
-      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '* ')) then
+      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '*' + #9)) then
     begin
       if dbText.SelStart = StrToNSString(dbText.Text, True).length then
       begin
-        InsText(LineEnding + '* ' + LineEnding);
+        InsText(LineEnding + '*' + #9 + LineEnding);
         dbText.SelStart := dbText.SelStart - UTF8Length(LineEnding);
       end
       else
       begin
-        InsText(LineEnding + '* ');
+        InsText(LineEnding + '*' + #9);
       end;
       Key := 0;
     end
     else
-    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '• ') and
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '•' + #9) and
       (StrToNSString(dbText.Lines[dbText.CaretPos.Y], True).length > 2) and
-      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '• ')) then
+      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '•' + #9)) then
     begin
       if dbText.SelStart = StrToNSString(dbText.Text, True).length then
       begin
-        InsText(LineEnding + '• ' + LineEnding);
+        InsText(LineEnding + '•' + #9 + LineEnding);
         dbText.SelStart := dbText.SelStart - UTF8Length(LineEnding);
       end
       else
       begin
-        InsText(LineEnding + '• ');
+        InsText(LineEnding + '•' + #9);
       end;
       Key := 0;
     end
     else
-    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '- ') and
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '-' + #9) and
       (StrToNSString(dbText.Lines[dbText.CaretPos.Y], True).length > 2) and
-      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '- ')) then
+      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '-' + #9)) then
     begin
       if dbText.SelStart = StrToNSString(dbText.Text, True).length then
       begin
-        InsText(LineEnding + '- ' + LineEnding);
+        InsText(LineEnding + '-' + #9 + LineEnding);
         dbText.SelStart := dbText.SelStart - UTF8Length(LineEnding);
       end
       else
       begin
-        InsText(LineEnding + '- ');
+        InsText(LineEnding + '-' + #9);
       end;
       Key := 0;
     end
     else
-    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '+ ') and
+    if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '+' + #9) and
       (StrToNSString(dbText.Lines[dbText.CaretPos.Y], True).length > 2) and
-      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '+ ')) then
+      (UTF8Copy(dbText.Text, dbText.SelStart + 1, 2) <> '+' + #9)) then
     begin
       if dbText.SelStart = StrToNSString(dbText.Text, True).length then
       begin
-        InsText(LineEnding + '+ ' + LineEnding);
+        InsText(LineEnding + '+' + #9 + LineEnding);
         dbText.SelStart := dbText.SelStart - UTF8Length(LineEnding);
       end
       else
       begin
-        InsText(LineEnding + '+ ');
+        InsText(LineEnding + '+' + #9);
       end;
       Key := 0;
     end
     else
     if ((TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1,
-      UTF8CocoaPos('. ', dbText.Lines[dbText.CaretPos.Y]) - 1), iNum) = True) and
-      (dbText.Lines[dbText.CaretPos.Y] = IntToStr(iNum) + '. ')) then
+      UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y]) - 1), iNum) = True) and
+      (dbText.Lines[dbText.CaretPos.Y] = IntToStr(iNum) + '.' + #9)) then
     begin
       rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
         textStorage.string_.paragraphRangeForRange(TCocoaTextView(
         NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
       TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
         setTextColor_range(ColorToNSColor(dbText.Font.Color), rng);
+      par := GetWritePara(TCocoaTextView(
+        NSScrollView(dbText.Handle).documentView).textStorage, 1);
+      par.setFirstLineHeadIndent(0);
+      par.setHeadIndent(0);
+      TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+        textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+        par, rng);
       TCocoaTextView(NSScrollView(dbText.Handle).documentView).
         selectParagraph(nil);
       TCocoaTextView(NSScrollView(dbText.Handle).documentView).
@@ -2004,18 +2022,18 @@ begin
     end
     else
     if (TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1,
-      UTF8CocoaPos('. ', dbText.Lines[dbText.CaretPos.Y]) - 1), iNum) =
+      UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y]) - 1), iNum) =
       True and (UTF8Copy(dbText.Text, dbText.SelStart + 1,
       UTF8Length(IntToStr(iNum))) <> IntToStr(iNum))) then
     begin
       if dbText.SelStart = StrToNSString(dbText.Text, True).length then
       begin
-        InsText(LineEnding + IntToStr(iNum + 1) + '. ' + LineEnding);
+        InsText(LineEnding + IntToStr(iNum + 1) + '.' + #9 + LineEnding);
         dbText.SelStart := dbText.SelStart - UTF8Length(LineEnding);
       end
       else
       begin
-        InsText(LineEnding + IntToStr(iNum + 1) + '. ');
+        InsText(LineEnding + IntToStr(iNum + 1) + '.' + #9);
       end;
       myRect := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
         visibleRect;
@@ -2029,13 +2047,14 @@ end;
 
 procedure TfmMain.dbTextKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
 var
-  iFormItalics, iFormBold, iFormCode, iFormQuote, iFormSqBracket,
-  iFormRnBracket, iFormFootnote, n, iLen, iTryInt: integer;
+  iFormItalics, iFormBold, iFormStrike, iFormCode, iFormQuote,
+  iFormSqBracket, iFormRnBracket, iFormFootnote, iParIndent, n, iLen, iTryInt: integer;
   stText: WideString;
   rng: NSRange;
   fd: NSFontDescriptor;
-  dict: NSDictionary;
+  par: NSMutableParagraphStyle;
   myFont, fixedFont, miniFont: NSFont;
+  iIdStrike: NSNumber;
 begin
   if dbText.Text = '' then
   begin
@@ -2047,7 +2066,9 @@ begin
     Exit;
   end
   else
-  if ((key = Ord('R')) and (Shift = [ssMeta])) then
+  //These keys could crash the app
+  if (((key = Ord('R')) or (key = Ord('D')) or (key = Ord('U'))) and
+    (Shift = [ssMeta])) then
   begin
     Exit;
   end
@@ -2060,15 +2081,56 @@ begin
   else
   if ((key = 13) and (dbText.Lines[dbText.CaretPos.Y] = '')) then
   begin
-    // To remove possibile font color
+    // To remove possibile font color and other stuff
     InsText(' ');
     rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       textStorage.string_.paragraphRangeForRange(TCocoaTextView(
       NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
     TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       setTextColor_range(ColorToNSColor(dbText.Font.Color), rng);
+    par := GetWritePara(TCocoaTextView(
+      NSScrollView(dbText.Handle).documentView).textStorage, 1);
+    par.setFirstLineHeadIndent(0);
+    par.setHeadIndent(0);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+      par, rng);
+    fd := FindFont(dbText.Font.Name, 0);
+    myFont := NSFont.fontWithDescriptor_size(fd, -dbText.font.Height);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      removeAttribute_range(NSBackgroundColorAttributeName, rng);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      applyFontTraits_range(NSUnboldFontMask, rng);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      applyFontTraits_range(NSUnitalicFontMask, rng);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      addAttribute_value_range(NSFontAttributeName, myFont, rng);
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).
       deleteBackward(nil);
+  end
+  else
+  if ((key = 13) and (UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 1) = '>')) then
+  begin
+    rng.location := dbText.SelStart - 2;
+    rng.length := 1;
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      replaceCharactersInRange_withString(rng, (NSStringUtf8(LineEnding + ' ')));
+    rng.length := 3;
+    par := GetWritePara(TCocoaTextView(
+      NSScrollView(dbText.Handle).documentView).textStorage, 1);
+    par.setFirstLineHeadIndent(0);
+    par.setHeadIndent(0);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+      par, rng);
+    fd := FindFont(dbText.Font.Name, 0);
+    myFont := NSFont.fontWithDescriptor_size(fd, -dbText.font.Height);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      addAttribute_value_range(NSFontAttributeName, myFont, rng);
+    rng.location := dbText.SelStart - 2;
+    rng.length := 1;
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      replaceCharactersInRange_withString(rng, (NSStringUtf8('')));
   end
   else
   if ((UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1, 2) = '# ') or
@@ -2080,8 +2142,11 @@ begin
       NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
     TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       setTextColor_range(ColorToNSColor(clTitle1), rng);
-    dbText.SelStart := dbText.SelStart - 1;
-    dbText.SelStart := dbText.SelStart + 1;
+    if dbText.SelStart > 0 then
+    begin
+      dbText.SelStart := dbText.SelStart - 1;
+      dbText.SelStart := dbText.SelStart + 1;
+    end;
     tmTitlesTimer.AutoEnabled := True;
   end
   else
@@ -2102,8 +2167,11 @@ begin
       NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
     TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       setTextColor_range(ColorToNSColor(clTitle2), rng);
-    dbText.SelStart := dbText.SelStart - 1;
-    dbText.SelStart := dbText.SelStart + 1;
+    if dbText.SelStart > 0 then
+    begin
+      dbText.SelStart := dbText.SelStart - 1;
+      dbText.SelStart := dbText.SelStart + 1;
+    end;
     tmTitlesTimer.AutoEnabled := True;
   end
   else
@@ -2121,13 +2189,10 @@ begin
   end
   else
   begin
-    dict := GetDict(TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-      textStorage, 0);
-    myFont := dict.objectForKey(NSFontAttributeName);
     fd := FindFont(dbText.Font.Name, 0);
     myFont := NSFont.fontWithDescriptor_size(fd, -dbText.font.Height);
     miniFont := NSFont.fontWithDescriptor_size(fd, 1);
-    fd := FindFont('Menlo', 0);
+    fd := FindFont(stFontMono, 0);
     fixedFont := NSFont.fontWithDescriptor_size(fd, -dbText.font.Height - 4);
     rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       textStorage.string_.paragraphRangeForRange(TCocoaTextView(
@@ -2142,13 +2207,25 @@ begin
       applyFontTraits_range(NSUnboldFontMask, rng);
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
       applyFontTraits_range(NSUnitalicFontMask, rng);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+      removeAttribute_range(NSStrikethroughStyleAttributeName, rng);
+    par := GetWritePara(TCocoaTextView(
+      NSScrollView(dbText.Handle).documentView).textStorage, 1);
+    par.setFirstLineHeadIndent(0);
+    par.setHeadIndent(0);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+      par, rng);
     iFormItalics := -1;
     iFormBold := -1;
+    iFormStrike := -1;
     iFormCode := -1;
     iFormQuote := -1;
     iFormSqBracket := -1;
     iFormRnBracket := -1;
     iFormFootnote := -1;
+    iParIndent := -1;
+    iIdStrike := NSNumber.numberWithInt(NSUnderlineStyleSingle);
     stText := WideString(dbText.Text);
     n := rng.location;
     iLen := rng.location + rng.length + 1;
@@ -2157,42 +2234,44 @@ begin
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         ((Ord(stText[n]) = 8226) or // It's the •
         (stText[n] = '*') or (stText[n] = '-') or (stText[n] = '+')) and
-        (stText[n + 1] = ' ')) then
+        (stText[n + 1] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 1;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         (TryStrToInt(string(stText[n]), iTryInt) = True) and
-        (stText[n + 1] = '.')) then
+        (stText[n + 1] = '.') and (stText[n + 2] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 2;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         (TryStrToInt(string(stText[n] + stText[n + 1]), iTryInt) = True) and
-        (stText[n + 2] = '.')) then
+        (stText[n + 2] = '.') and (stText[n + 3] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 3;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
-      if ((iFormCode = -1) and (stText[n] = '`') and
-        (stText[n + 1] <> ' ')) then
+      if ((iFormCode = -1) and (stText[n] = '`') and (stText[n + 1] <> ' ')) then
       begin
         iFormCode := n;
       end
       else
-      if ((iFormQuote = -1) and (stText[n] = '>') and
-        (stText[n + 1] = ' ') and ((n = 1) or (stText[n - 1] = LineEnding))) then
+      if ((iFormQuote = -1) and (stText[n] = '>') and (stText[n + 1] = ' ') and
+        ((n = 1) or (stText[n - 1] = LineEnding))) then
       begin
         iFormQuote := n;
       end
@@ -2209,16 +2288,24 @@ begin
       end
       else
       if ((iFormItalics = -1) and (stText[n] = '*') and
-        (stText[n + 1] <> ' ') and (stText[n + 1] <> '*')) then
+        (stText[n + 1] <> ' ') and (stText[n + 1] <> '*') and
+        (iFormCode = -1)) then
       begin
         iFormItalics := n;
       end
       else
-      if ((iFormBold = -1) and (stText[n] = '*') and
-        (stText[n + 1] = '*')) then
+      if ((iFormBold = -1) and (stText[n] = '*') and (stText[n + 1] = '*') and
+        (iFormCode = -1)) then
       begin
         iFormBold := n;
         Inc(n);
+      end
+      else
+      if ((iFormStrike = -1) and (stText[n] = '~') and
+        (stText[n + 1] = '~') and (stText[n + 2] <> ' ') and
+        (iFormCode = -1)) then
+      begin
+        iFormStrike := n;
       end
       else
       if ((stText[n] = '*') and (iFormItalics > -1)) then
@@ -2242,8 +2329,7 @@ begin
         iFormItalics := -1;
       end
       else
-      if ((stText[n] = '*') and (stText[n + 1] = '*') and
-        (iFormBold > -1)) then
+      if ((stText[n] = '*') and (stText[n + 1] = '*') and (iFormBold > -1)) then
       begin
         if stText[n - 1] = '*' then
         begin
@@ -2283,6 +2369,27 @@ begin
           applyFontTraits_range(NSBoldFontMask, rng);
         iFormBold := -1;
         Inc(n);
+      end
+      else
+      if ((stText[n] = '~') and (stText[n + 1] = '~') and (iFormStrike > -1)) then
+      begin
+        rng.location := iFormStrike + 1;
+        rng.length := n - iFormStrike - 2;
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSStrikethroughStyleAttributeName, iIdStrike, rng);
+        rng.location := iFormStrike - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clBackground), rng);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSFontAttributeName, miniFont, rng);
+        rng.location := n - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clBackground), rng);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSFontAttributeName, miniFont, rng);
+        iFormStrike := -1;
       end
       else
       if ((stText[n] = '`') and (iFormCode > -1)) then
@@ -2325,12 +2432,33 @@ begin
           addAttribute_value_range(NSBackgroundColorAttributeName,
           ColorToNSColor(clCode), rng);
         rng.location := iFormQuote - 1;
+        par := GetWritePara(TCocoaTextView(
+          NSScrollView(dbText.Handle).documentView).textStorage, 1);
+        par.setFirstLineHeadIndent(iIndent);
+        par.setHeadIndent(iIndent);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+          textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+          par, rng);
         rng.length := 2;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clBackground), rng);
         TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
           addAttribute_value_range(NSFontAttributeName, miniFont, rng);
         iFormQuote := -1;
+      end
+      else
+      if (((stText[n] = LineEnding) or (n = Length(stText))) and
+        (iParIndent > -1)) then
+      begin
+        rng.location := iParIndent - 1;
+        rng.length := n - iParIndent;
+        par := GetWritePara(TCocoaTextView(
+          NSScrollView(dbText.Handle).documentView).textStorage, 1);
+        par.setFirstLineHeadIndent(iIndent);
+        par.setHeadIndent(iIndent * 2);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+          textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+          par, rng);
       end
       else
       if ((stText[n] = ']') and (iFormSqBracket > -1)) then
@@ -2396,8 +2524,11 @@ begin
     end;
     if UTF8Copy(dbText.Lines[dbText.CaretPos.Y - 1], 1, 1) = '#' then
     begin
-      dbText.SelStart := dbText.SelStart - 1;
-      dbText.SelStart := dbText.SelStart + 1;
+      if dbText.SelStart > 0 then
+      begin
+        dbText.SelStart := dbText.SelStart - 1;
+        dbText.SelStart := dbText.SelStart + 1;
+      end;
     end;
   end;
   UpdateInfo;
@@ -2513,7 +2644,7 @@ begin
 end;
 
 procedure TfmMain.dbTasksContextPopup(Sender: TObject; MousePos: TPoint;
-  var Handled: Boolean);
+  var Handled: boolean);
 begin
   if zqTasks.RecordCount = 0 then
   begin
@@ -2560,8 +2691,7 @@ end;
 procedure TfmMain.grAttachmentsGetCellHint(Sender: TObject; Column: TColumn;
   var AText: string);
 begin
-  if grAttachments.Canvas.TextWidth(Column.Field.AsString) >
-    grAttachments.Width then
+  if grAttachments.Canvas.TextWidth(Column.Field.AsString) > grAttachments.Width then
   begin
     AText := Column.Field.AsString;
   end;
@@ -2798,8 +2928,7 @@ end;
 procedure TfmMain.grNotebooksGetCellHint(Sender: TObject; Column: TColumn;
   var AText: string);
 begin
-  if grNotebooks.Canvas.TextWidth(Column.Field.AsString) >
-    grNotebooks.Width then
+  if grNotebooks.Canvas.TextWidth(Column.Field.AsString) > grNotebooks.Width then
   begin
     AText := Column.Field.AsString;
   end;
@@ -3466,7 +3595,7 @@ procedure TfmMain.miEditPandocClick(Sender: TObject);
 var
   stArgument, stInput, stOutput, stDone: string;
   slText: TStringList;
-  i: integer;
+  i, iTryInt: integer;
   blAddLineEnd: boolean;
 begin
   if dbText.Text = '' then
@@ -3483,10 +3612,36 @@ begin
     blAddLineEnd := True;
     for i := 0 to dbText.Lines.Count - 1 do
     begin
-      if UTF8Copy((dbText.Lines[i]), 1, 2) = '• ' then
+      if UTF8Copy((dbText.Lines[i]), 1, 2) = '•' + #9 then
       begin
         slText.Add('* ' + UTF8Copy(dbText.Lines[i], 3,
           StrToNSString(dbText.Lines[i], True).length));
+      end
+      else
+      if UTF8Copy((dbText.Lines[i]), 1, 2) = '*' + #9 then
+      begin
+        slText.Add('* ' + UTF8Copy(dbText.Lines[i], 3,
+          StrToNSString(dbText.Lines[i], True).length));
+      end
+      else
+      if UTF8Copy((dbText.Lines[i]), 1, 2) = '+' + #9 then
+      begin
+        slText.Add('+ ' + UTF8Copy(dbText.Lines[i], 3,
+          StrToNSString(dbText.Lines[i], True).length));
+      end
+      else
+      if UTF8Copy((dbText.Lines[i]), 1, 2) = '-' + #9 then
+      begin
+        slText.Add('- ' + UTF8Copy(dbText.Lines[i], 3,
+          StrToNSString(dbText.Lines[i], True).length));
+      end
+      else
+      if TryStrToInt(UTF8Copy(dbText.Lines[i], 1, UTF8Pos('.' + #9,
+        dbText.Lines[i]) - 1), iTryInt) = True then
+      begin
+        slText.Add(UTF8Copy(dbText.Lines[i], 1, UTF8Pos('.' + #9,
+          dbText.Lines[i])) + ' ' + UTF8Copy(dbText.Lines[i],
+          UTF8Pos('.' + #9, dbText.Lines[i]) + 2, UTF8Length(dbText.Lines[i])));
       end
       else
       begin
@@ -5590,8 +5745,7 @@ begin
   zcConnection.Database := edDbName.Text;
   dbname := edDbName.Text;
   fmBookmarks.stDbName := StringReplace(dbName, ' ', '', [rfReplaceAll]);
-  if FileExistsUTF8(myHomeDir + 'pgnotex-' + fmBookmarks.stDbName +
-    '-bookmarks') then
+  if FileExistsUTF8(myHomeDir + 'pgnotex-' + fmBookmarks.stDbName + '-bookmarks') then
   begin
     fmBookmarks.sgBookmarks.LoadFromFile(myHomeDir + 'pgnotex-' +
       fmBookmarks.stDbName + '-bookmarks');
@@ -5703,6 +5857,7 @@ begin
   shSave.Brush.Color := TColor($76CF76);
   fmMain.KeyPreview := True;
   lbTime.Visible := True;
+  itTimeTimer(nil);
 end;
 
 procedure TfmMain.SaveAll;
@@ -6077,16 +6232,18 @@ end;
 
 procedure TfmMain.FormatListTitles(ListTitles: boolean; FormatText: boolean);
 var
-  i, iPos, iTit1, iTit2, iTit3, iTit4, iTit5, iTit6, iFontSize,
-  iFormItalics, iFormBold, iFormCode, iFormQuote, iFormSqBracket,
-  iFormRnBracket, iFormFootnote, n, iLen, iTryInt: integer;
+  i, iTab, iPos, iTit1, iTit2, iTit3, iTit4, iTit5, iTit6, iFontSize,
+  iParIndent, iFormItalics, iFormBold, iFormStrike, iFormCode,
+  iFormQuote, iFormSqBracket, iFormRnBracket, iFormFootnote, n, iLen, iTryInt: integer;
   stTit: string = '';
   stText: WideString = '';
   rng: NSRange;
   fd: NSFontDescriptor;
   myFont, fixedFont, miniFont: NSFont;
-  dict: NSDictionary;
   par: NSMutableParagraphStyle;
+  tabs: NSMutableArray;
+  tab: NSTextTab;
+  iIdStrike: NSNumber;
 begin
   if ((zqNotes.RecordCount = 0) or (dbText.Text = '')) then
   begin
@@ -6098,20 +6255,32 @@ begin
     iFontSize := -dbText.font.Height;
     rng.location := 0;
     rng.length := StrToNSString(dbText.Text, True).length;
-    dict := GetDict(TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-      textStorage, rng.location);
     par := GetWritePara(TCocoaTextView(
       NSScrollView(dbText.Handle).documentView).textStorage, 1);
     par.setLineSpacing(iLineSpacing);
     par.setParagraphSpacing(iParSpacing);
+    par.setFirstLineHeadIndent(0);
+    par.setHeadIndent(0);
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).
       textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
       par, rng);
-    myFont := dict.objectForKey(NSFontAttributeName);
+    tabs := NSMutableArray.alloc.init;
+    iIndent := dbText.Font.Size * 3 - dbText.Font.Size div 3;
+    for iTab := 1 to 30 do
+    begin
+      tab := NSTextTab.alloc.initWithType_location(NSLeftTabStopType,
+        iTab * iIndent);
+      Tabs.addObject(tab);
+      tab.Release;
+    end;
+    par.setTabStops(tabs);
+    TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+      textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+      par, rng);
     fd := FindFont(dbText.Font.Name, 0);
     myFont := NSFont.fontWithDescriptor_size(fd, iFontSize);
     miniFont := NSFont.fontWithDescriptor_size(fd, 1);
-    fd := FindFont('Menlo', 0);
+    fd := FindFont(stFontMono, 0);
     fixedFont := NSFont.fontWithDescriptor_size(fd, iFontSize - 4);
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
       addAttribute_value_range(NSFontAttributeName, myFont, rng);
@@ -6133,11 +6302,14 @@ begin
       checkTextInDocument(nil);
     iFormItalics := -1;
     iFormBold := -1;
+    iFormStrike := -1;
     iFormCode := -1;
     iFormQuote := -1;
     iFormSqBracket := -1;
     iFormRnBracket := -1;
     iFormFootnote := -1;
+    iParIndent := -1;
+    iIdStrike := NSNumber.numberWithInt(NSUnderlineStyleSingle);
     n := 1;
     stText := WideString(dbText.Text);
     iLen := Length(stText);
@@ -6148,43 +6320,44 @@ begin
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         ((Ord(stText[n]) = 8226) or // It's the •
         (stText[n] = '*') or (stText[n] = '-') or (stText[n] = '+')) and
-        (stText[n + 1] = ' ')) then
+        (stText[n + 1] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 1;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         (TryStrToInt(string(stText[n]), iTryInt) = True) and
-        (stText[n + 1] = '.')) then
+        (stText[n + 1] = '.') and (stText[n + 2] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 2;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
       if (((n = 1) or (stText[n - 1] = LineEnding)) and
         (TryStrToInt(string(stText[n] + stText[n + 1]), iTryInt) = True) and
-        (stText[n + 2] = '.')) then
+        (stText[n + 2] = '.') and (stText[n + 3] = #9)) then
       begin
         rng.location := n - 1;
         rng.length := 3;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
+        iParIndent := n;
       end
       else
-      if ((iFormCode = -1) and (stText[n] = '`') and
-        (stText[n + 1] <> ' ')) then
+      if ((iFormCode = -1) and (stText[n] = '`') and (stText[n + 1] <> ' ')) then
       begin
         iFormCode := n;
       end
       else
-      if ((iFormQuote = -1) and (stText[n] = '>') and
-        (stText[n + 1] = ' ') and ((n = 1) or
-        (stText[n - 1] = LineEnding))) then
+      if ((iFormQuote = -1) and (stText[n] = '>') and (stText[n + 1] = ' ') and
+        ((n = 1) or (stText[n - 1] = LineEnding))) then
       begin
         iFormQuote := n;
       end
@@ -6201,16 +6374,24 @@ begin
       end
       else
       if ((iFormItalics = -1) and (stText[n] = '*') and
-        (stText[n + 1] <> ' ') and (stText[n + 1] <> '*')) then
+        (stText[n + 1] <> ' ') and (stText[n + 1] <> '*') and
+        (iFormCode = -1)) then
       begin
         iFormItalics := n;
       end
       else
-      if ((iFormBold = -1) and (stText[n] = '*') and
-        (stText[n + 1] = '*')) then
+      if ((iFormBold = -1) and (stText[n] = '*') and (stText[n + 1] = '*') and
+        (iFormCode = -1)) then
       begin
         iFormBold := n;
         Inc(n);
+      end
+      else
+      if ((iFormStrike = -1) and (stText[n] = '~') and
+        (stText[n + 1] = '~') and (stText[n + 2] <> ' ') and
+        (iFormCode = -1)) then
+      begin
+        iFormStrike := n;
       end
       else
       if ((stText[n] = '*') and (iFormItalics > -1)) then
@@ -6234,8 +6415,7 @@ begin
         iFormItalics := -1;
       end
       else
-      if ((stText[n] = '*') and (stText[n + 1] = '*') and
-        (iFormBold > -1)) then
+      if ((stText[n] = '*') and (stText[n + 1] = '*') and (iFormBold > -1)) then
       begin
         if stText[n - 1] = '*' then
         begin
@@ -6275,6 +6455,27 @@ begin
           applyFontTraits_range(NSBoldFontMask, rng);
         iFormBold := -1;
         Inc(n);
+      end
+      else
+      if ((stText[n] = '~') and (stText[n + 1] = '~') and (iFormStrike > -1)) then
+      begin
+        rng.location := iFormStrike + 1;
+        rng.length := n - iFormStrike - 2;
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSStrikethroughStyleAttributeName, iIdStrike, rng);
+        rng.location := iFormStrike - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clBackground), rng);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSFontAttributeName, miniFont, rng);
+        rng.location := n - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clBackground), rng);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
+          addAttribute_value_range(NSFontAttributeName, miniFont, rng);
+        iFormStrike := -1;
       end
       else
       if ((stText[n] = '`') and (iFormCode > -1)) then
@@ -6317,12 +6518,33 @@ begin
             addAttribute_value_range(NSBackgroundColorAttributeName,
             ColorToNSColor(clCode), rng);
           rng.location := iFormQuote - 1;
+          par := GetWritePara(TCocoaTextView(
+            NSScrollView(dbText.Handle).documentView).textStorage, 1);
+          par.setFirstLineHeadIndent(iIndent);
+          par.setHeadIndent(iIndent);
+          TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+            textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+            par, rng);
           rng.length := 2;
           TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
             setTextColor_range(ColorToNSColor(clBackground), rng);
           TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
             addAttribute_value_range(NSFontAttributeName, miniFont, rng);
           iFormQuote := -1;
+        end
+        else
+        if iParIndent > -1 then
+        begin
+          rng.location := iParIndent - 1;
+          rng.length := n - iParIndent;
+          par := GetWritePara(TCocoaTextView(
+            NSScrollView(dbText.Handle).documentView).textStorage, 1);
+          par.setFirstLineHeadIndent(iIndent);
+          par.setHeadIndent(iIndent * 2);
+          TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+            textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+            par, rng);
+          iParIndent := -1;
         end;
       end
       else
@@ -6333,6 +6555,13 @@ begin
         TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
           addAttribute_value_range(NSBackgroundColorAttributeName,
           ColorToNSColor(clCode), rng);
+        par := GetWritePara(TCocoaTextView(
+          NSScrollView(dbText.Handle).documentView).textStorage, 1);
+        par.setFirstLineHeadIndent(iIndent);
+        par.setHeadIndent(iIndent);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+          textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+          par, rng);
         rng.location := iFormQuote - 1;
         rng.length := 2;
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
@@ -6340,6 +6569,18 @@ begin
         TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
           addAttribute_value_range(NSFontAttributeName, miniFont, rng);
         iFormQuote := -1;
+      end
+      else
+      if ((n = Length(stText)) and (iParIndent > -1)) then
+      begin
+        rng.location := iParIndent - 1;
+        rng.length := n - iParIndent + 1;
+        par.setFirstLineHeadIndent(iIndent);
+        par.setHeadIndent(iIndent * 2);
+        TCocoaTextView(NSScrollView(dbText.Handle).documentView).
+          textStorage.addAttribute_value_range(NSParagraphStyleAttributeName,
+          par, rng);
+        iParIndent := -1;
       end
       else
       if ((stText[n] = ']') and (iFormSqBracket > -1)) then
@@ -6404,8 +6645,7 @@ begin
       Inc(n);
     end;
   end;
-  if ((dbText.Text = '') or (StrToNSString(dbText.Text, True).length >
-    iMaxSize)) then
+  if ((dbText.Text = '') or (StrToNSString(dbText.Text, True).length > iMaxSize)) then
   begin
     if ListTitles = True then
     begin
@@ -6712,8 +6952,8 @@ begin
     iStart := iPos - 1;
     while ((iStart >= 0) and (iStart < Length(stText) - 3)) do
     begin
-      if ((stText[iStart] = LineEnding) and
-        (stText[iStart + 1] = LineEnding)) then
+      if ((stText[iStart] = LineEnding) and (stText[iStart + 1] =
+        LineEnding)) then
       begin
         Break;
       end;
@@ -6740,7 +6980,7 @@ begin
     if ((stText[i] = LineEnding) or (i = 0)) then
     begin
       if ((TryStrToInt(string(stText[i + 1]), iTest) = True) and
-        (stText[i + 2] = '.') and (stText[i + 3] = ' ')) then
+        (stText[i + 2] = '.') and (stText[i + 3] = #9)) then
       begin
         rng.location := i;
         rng.length := 1;
@@ -6749,7 +6989,7 @@ begin
         iEnd := iEnd + UTF8Length(IntToStr(iNum)) - 1;
         if iNum > 9 then
         begin
-          Insert(' ', stText, i + 1);
+          Insert(#9, stText, i + 1);
         end;
         if iPos > i + 1 then
         begin
@@ -6759,7 +6999,7 @@ begin
       end
       else
       if ((TryStrToInt(string(stText[i + 1]) + string(stText[i + 2]), iTest) =
-        True) and (stText[i + 3] = '.') and (stText[i + 4] = ' ')) then
+        True) and (stText[i + 3] = '.') and (stText[i + 4] = #9)) then
       begin
         rng.location := i;
         rng.length := 2;
@@ -6792,8 +7032,7 @@ var
   blStartNum: boolean;
   slNotesList: TStringList;
 begin
-  if ((zqNotes.RecordCount = 0) or (dbText.Text = '') or
-    (dbText.SelStart < 1)) then
+  if ((zqNotes.RecordCount = 0) or (dbText.Text = '') or (dbText.SelStart < 1)) then
   begin
     Exit;
   end;
@@ -6877,8 +7116,7 @@ var
   stText, stNum: WideString;
   blStartNum: boolean;
 begin
-  if ((zqNotes.RecordCount = 0) or (dbText.Text = '') or
-    (dbText.SelStart < 1)) then
+  if ((zqNotes.RecordCount = 0) or (dbText.Text = '') or (dbText.SelStart < 1)) then
   begin
     Exit;
   end;
@@ -6892,13 +7130,14 @@ begin
     iPos := UTF8CocoaPos(']', dbText.Lines[dbText.CaretPos.y]);
     dbText.SelStart := UTF8CocoaPos(UTF8Copy(dbText.Lines[dbText.CaretPos.y],
       1, iPos), dbText.Text) + iPos - 1;
-    if UTF8Copy(dbText.Text, dbText.SelStart + 1, 1) = ' ' then
+    if UTF8Copy(dbText.Text, dbText.SelStart + 1, 1) = #9 then
     begin
       dbText.SelStart := dbText.SelStart + 1;
     end;
   end
   else
   begin
+    Application.ProcessMessages;
     stText := WideString(dbText.Text);
     iStart := dbText.SelStart;
     iEnd := dbText.SelStart;
@@ -6922,8 +7161,8 @@ begin
       end;
     end;
     if ((iEnd > iStart + 2) and
-      (TryStrToInt(UTF8Copy(string(stText), iStart + 2,
-        iEnd - iStart - 2), iNew) = True)) then
+      (TryStrToInt(UTF8Copy(string(stText), iStart + 2, iEnd - iStart - 2), iNew) =
+      True)) then
     begin
       if UTF8CocoaPos('[^' + IntToStr(iNew) + ']:', dbText.Text, iEnd) > 0 then
       begin
@@ -6971,6 +7210,10 @@ begin
         Inc(i);
       end;
       InsText('[^' + IntToStr(iMaxNum + 1) + ']');
+      while dbText.Lines[dbText.Lines.Count - 1] = '' do
+      begin
+        dbText.Lines.Delete(dbText.Lines.Count - 1);
+      end;
       dbText.Lines.Add('[^' + IntToStr(iMaxNum + 1) + ']: ' + #1);
       RenumberFootnotes;
       FormatListTitles(False, True);
@@ -7059,22 +7302,19 @@ begin
   iNum := 1;
   while i < StrToNSString(dbText.Text, True).length - 4 do
   begin
-    if ((Chr(StrToNSString(dbText.Text, True).
-      characterAtIndex(i)) = LineEnding) and
-      (Chr(StrToNSString(dbText.Text, True).
-      characterAtIndex(i + 1)) = LineEnding)) then
+    if ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i)) = LineEnding) and
+      (Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1)) = LineEnding)) then
     begin
       Break;
     end
     else
-    if ((Chr(StrToNSString(dbText.Text, True).
-      characterAtIndex(i)) = LineEnding) or
+    if ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i)) = LineEnding) or
       (i = 0)) then
     begin
       if ((TryStrToInt(NSStringToString(StrToNSString(dbText.Text,
         True).substringWithRange(NSMakeRange(i, 1))), iTest) = True) and
         (StrToNSString(dbText.Text, True).substringWithRange(
-        NSMakeRange(i + 1, 2)) = NSStringUtf8('. ')) and (i = 0)) then
+        NSMakeRange(i + 1, 2)) = NSStringUtf8('.' + #9)) and (i = 0)) then
       begin
         rng.location := i;
         rng.length := 3;
@@ -7086,7 +7326,7 @@ begin
       if ((TryStrToInt(NSStringToString(StrToNSString(dbText.Text,
         True).substringWithRange(NSMakeRange(i, 2))), iTest) = True) and
         (StrToNSString(dbText.Text, True).substringWithRange(
-        NSMakeRange(i + 2, 2)) = NSStringUtf8('. ')) and (i = 0)) then
+        NSMakeRange(i + 2, 2)) = NSStringUtf8('.' + #9)) and (i = 0)) then
       begin
         rng.location := i;
         rng.length := 4;
@@ -7097,7 +7337,7 @@ begin
       if ((TryStrToInt(NSStringToString(StrToNSString(dbText.Text,
         True).substringWithRange(NSMakeRange(i + 1, 1))), iTest) = True) and
         (StrToNSString(dbText.Text, True).substringWithRange(
-        NSMakeRange(i + 2, 2)) = NSStringUtf8('. '))) then
+        NSMakeRange(i + 2, 2)) = NSStringUtf8('.' + #9))) then
       begin
         rng.location := i + 1;
         rng.length := 3;
@@ -7109,7 +7349,7 @@ begin
       if ((TryStrToInt(NSStringToString(StrToNSString(dbText.Text,
         True).substringWithRange(NSMakeRange(i + 1, 2))), iTest) = True) and
         (StrToNSString(dbText.Text, True).substringWithRange(
-        NSMakeRange(i + 3, 2)) = NSStringUtf8('. '))) then
+        NSMakeRange(i + 3, 2)) = NSStringUtf8('.' + #9))) then
       begin
         rng.location := i + 1;
         rng.length := 4;
@@ -7121,7 +7361,7 @@ begin
         ((StrToNSString(dbText.Text, True).characterAtIndex(i)) = 8226) or // •
         ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i))) = '-') or
         ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i))) = '+')) and
-        (Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1)) = ' ') and
+        (Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1)) = #9) and
         (i = 0)) then
       begin
         rng.location := i;
@@ -7147,16 +7387,13 @@ begin
         end;
       end
       else
-      if ((((Chr(StrToNSString(dbText.Text, True).
-        characterAtIndex(i + 1))) = '*') or
-        ((StrToNSString(dbText.Text, True).
-        characterAtIndex(i + 1)) = 8226) or // •
-        ((Chr(StrToNSString(dbText.Text, True).
-        characterAtIndex(i + 1))) = '-') or
-        ((Chr(StrToNSString(dbText.Text, True).
-        characterAtIndex(i + 1))) = '+')) and
-        (Chr(StrToNSString(dbText.Text, True).
-        characterAtIndex(i + 2)) = ' ')) then
+      if ((((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1))) =
+        '*') or ((StrToNSString(dbText.Text, True).characterAtIndex(i + 1)) =
+        8226) or // •
+        ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1))) = '-') or
+        ((Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 1))) =
+        '+')) and (Chr(StrToNSString(dbText.Text, True).characterAtIndex(i + 2)) =
+        #9)) then
       begin
         rng.location := i + 1;
         if stHeader = '' then
@@ -7188,7 +7425,7 @@ begin
         end;
         rng.length := 0;
         TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-          insertText_replacementRange(NSStringUtf8(stHeader + ' '), rng);
+          insertText_replacementRange(NSStringUtf8(stHeader + #9), rng);
         iNum := 1;
       end;
     end;

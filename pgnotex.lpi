@@ -26,7 +26,8 @@
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="5"/>
-      <StringTable Comments="A free software to manage documents, tasks and files with PostgreSQL" InternalName="pgNotex" LegalCopyright="Massimo Nardello, Modena 2020-2024" LegalTrademarks="Massimo Nardello, Modena 2020-2024" OriginalFilename="pgNotex" ProductName="pgNotex" ProductVersion="1.5.0.0"/>
+      <BuildNr Value="1"/>
+      <StringTable Comments="A free software to manage documents, tasks and files with PostgreSQL" InternalName="pgNotex" LegalCopyright="Massimo Nardello, Modena 2020-2024" LegalTrademarks="Massimo Nardello, Modena 2020-2024" OriginalFilename="pgNotex" ProductName="pgNotex" ProductVersion="1.5.0.1"/>
     </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>

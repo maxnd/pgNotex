@@ -8,5 +8,5 @@
 {"hash":111733157,"name":"tfmcopyright.lbpostgres.caption","sourcebytes":[80,111,115,116,103,114,101,83,81,76,32,119,101,98,32,115,105,116,101],"value":"PostgreSQL web site"},
 {"hash":153856184,"name":"tfmcopyright.lbapp.caption","sourcebytes":[87,101,98,115,105,116,101,32,111,102,32,112,103,78,111,116,101,120],"value":"Website of pgNotex"},
 {"hash":214540302,"name":"tfmcopyright.lbcopyrightvers.caption","sourcebytes":[86,101,114,115,105,111,110],"value":"Version"},
-{"hash":68686624,"name":"tfmcopyright.lbcopyrightvers1.caption","sourcebytes":[49,46,53,46,48,46,48],"value":"1.5.0.0"}
+{"hash":68686625,"name":"tfmcopyright.lbcopyrightvers1.caption","sourcebytes":[49,46,53,46,48,46,49],"value":"1.5.0.1"}
 ]}
