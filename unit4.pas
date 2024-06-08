@@ -102,6 +102,7 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
   private
+    procedure UpdateText;
 
   public
 
@@ -247,6 +248,7 @@ begin
   if fmMain.pnMain.Visible = True then
   begin
     fmMain.FormatListTitles(False, True);
+    UpdateText;
   end;
 end;
 
@@ -278,6 +280,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -291,6 +294,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -322,6 +326,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -335,6 +340,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -348,6 +354,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -361,6 +368,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -393,6 +401,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -407,6 +416,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -421,6 +431,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -435,6 +446,7 @@ begin
     if fmMain.pnMain.Visible = True then
     begin
       fmMain.FormatListTitles(False, True);
+      UpdateText;
     end;
   end;
 end;
@@ -452,12 +464,23 @@ begin
   if fmMain.pnMain.Visible = True then
   begin
     fmMain.FormatListTitles(True, False);
+    UpdateText;
   end;
 end;
 
 procedure TfmOptions.bnCloseClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TfmOptions.UpdateText;
+begin
+    if fmMain.dbText.SelStart > 0 then
+  begin
+    Application.ProcessMessages;
+    fmMain.dbText.SelStart := fmMain.dbText.SelStart - 1;
+    fmMain.dbText.SelStart := fmMain.dbText.SelStart + 1;
+  end;
 end;
 
 end.

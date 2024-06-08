@@ -26,7 +26,8 @@ unit Unit11;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Menus,
+  CocoaUtils;
 
 type
 
@@ -75,7 +76,7 @@ end;
 
 procedure TfmPicture.FormShow(Sender: TObject);
 begin
-  if IsPaintDark = False then
+  if IsAppDark = False then
   begin
     fmPicture.Color := clWhite;
   end;

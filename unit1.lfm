@@ -1538,10 +1538,10 @@ object fmMain: TfmMain
             OnMouseMove = sgTitlesMouseMove
           end
           object dbText: TMemo
-            Left = 231
+            Left = 232
             Height = 408
             Top = 0
-            Width = 320
+            Width = 319
             Align = alClient
             BorderSpacing.Left = 10
             BorderSpacing.Bottom = 10
@@ -1562,7 +1562,7 @@ object fmMain: TfmMain
             Left = 220
             Height = 418
             Top = 0
-            Width = 1
+            Width = 2
             Beveled = True
           end
         end
@@ -2410,6 +2410,13 @@ object fmMain: TfmMain
         end
       end
       object N36: TMenuItem
+        Caption = '-'
+      end
+      object miToolsRun: TMenuItem
+        Caption = 'Run another instance'
+        OnClick = miToolsRunClick
+      end
+      object Separator4: TMenuItem
         Caption = '-'
       end
       object miToolsOptions: TMenuItem
