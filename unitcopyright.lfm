@@ -3,6 +3,8 @@ object fmCopyright: TfmCopyright
   Height = 422
   Top = 280
   Width = 585
+  AlphaBlend = True
+  AlphaBlendValue = 220
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Copyright'
@@ -3742,7 +3744,7 @@ object fmCopyright: TfmCopyright
     Height = 16
     Top = 118
     Width = 39
-    Caption = '1.5.0.2'
+    Caption = '1.5.0.3'
     Font.Color = 4240880
     ParentColor = False
     ParentFont = False

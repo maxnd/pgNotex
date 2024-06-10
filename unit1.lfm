@@ -1,7 +1,7 @@
 object fmMain: TfmMain
-  Left = 35
+  Left = 64
   Height = 754
-  Top = 53
+  Top = 69
   Width = 1405
   AllowDropFiles = True
   Caption = 'pgNotex'
@@ -1563,7 +1563,8 @@ object fmMain: TfmMain
             Height = 418
             Top = 0
             Width = 2
-            Beveled = True
+            Color = cl3DLight
+            ParentColor = False
           end
         end
       end

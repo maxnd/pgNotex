@@ -1283,7 +1283,7 @@ begin
   TCocoaTextView(NSScrollView(dbText.Handle).documentView).
     setRichText(True);
   TCocoaTextView(NSScrollView(dbText.Handle).documentView).
-    textContainer.setLineFragmentPadding(10);
+    textContainer.setLineFragmentPadding(30);
 end;
 
 procedure TfmMain.FormDropFiles(Sender: TObject; const FileNames: array of string);
@@ -1304,6 +1304,8 @@ begin
 end;
 
 procedure TfmMain.FormKeyDown(Sender: TObject; var Key: word; Shift: TShiftState);
+var
+  rng: NSRange;
 begin
   if pnMain.Visible = False then
     Exit;
@@ -1350,6 +1352,12 @@ begin
     begin
       iParSpacing := iParSpacing + 1;
       FormatListTitles(False, True);
+      rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+        NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+      Application.ProcessMessages;
+      TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        scrollRangeToVisible(rng);
     end;
     key := 0;
   end
@@ -1360,6 +1368,12 @@ begin
     begin
       iParSpacing := iParSpacing - 1;
       FormatListTitles(False, True);
+      rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+        NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+      Application.ProcessMessages;
+      TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        scrollRangeToVisible(rng);
     end;
     key := 0;
   end
@@ -1370,6 +1384,12 @@ begin
     begin
       iLineSpacing := iLineSpacing + 1;
       FormatListTitles(False, True);
+      rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+        NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+      Application.ProcessMessages;
+      TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        scrollRangeToVisible(rng);
     end;
     key := 0;
   end
@@ -1380,6 +1400,12 @@ begin
     begin
       iLineSpacing := iLineSpacing - 1;
       FormatListTitles(False, True);
+      rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+        NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+      Application.ProcessMessages;
+      TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+        scrollRangeToVisible(rng);
     end;
     key := 0;
   end
@@ -1395,6 +1421,12 @@ begin
       sgTitles.Font.Size := sgTitles.Font.Size + 1;
     end;
     FormatListTitles(False, True);
+    rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+      textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+      NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+    Application.ProcessMessages;
+    TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+      scrollRangeToVisible(rng);
     key := 0;
   end
   else
@@ -1409,6 +1441,12 @@ begin
       sgTitles.Font.Size := sgTitles.Font.Size - 1;
     end;
     FormatListTitles(False, True);
+    rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+      textStorage.string_.paragraphRangeForRange(TCocoaTextView(
+      NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+    Application.ProcessMessages;
+    TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+      scrollRangeToVisible(rng);
     key := 0;
   end
   else
@@ -1573,6 +1611,15 @@ begin
     begin
       rng.location := rng.location + 2;
       rng.length := rng.length - 2;
+    end
+    else
+    if TryStrToInt(UTF8Copy(dbText.Lines[dbText.CaretPos.Y], 1,
+    UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y]) - 1), iNum) = True then
+    begin
+      rng.location := rng.location +
+        UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y]) + 1;
+      rng.length := rng.length -
+        UTF8CocoaPos('.' + #9, dbText.Lines[dbText.CaretPos.Y]) - 2;
     end;
     if IsAppDark = True then
     begin
@@ -2101,7 +2148,8 @@ end;
 procedure TfmMain.dbTextKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
 var
   iFormItalics, iFormBold, iFormStrike, iFormCode, iFormQuote,
-  iFormSqBracket, iFormRnBracket, iFormFootnote, iParIndent, n, iLen, iTryInt: integer;
+  iFormSqBracket, iFormRnBracket, iFormFootnote, iFormInlineNote, iParIndent, n,
+  iLen, iTryInt: integer;
   stText: WideString;
   rng: NSRange;
   fd: NSFontDescriptor;
@@ -2229,6 +2277,10 @@ begin
     rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       textStorage.string_.paragraphRangeForRange(TCocoaTextView(
       NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+    if rng.length = 0 then
+    begin
+      Exit;
+    end;
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
       removeAttribute_range(NSBackgroundColorAttributeName, rng);
     TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
@@ -2266,6 +2318,10 @@ begin
     rng := TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
       textStorage.string_.paragraphRangeForRange(TCocoaTextView(
       NSScrollView(fmMain.dbText.Handle).documentView).selectedRange);
+    if rng.length = 0 then
+    begin
+      Exit;
+    end;
     TCocoaTextView(NSScrollView(dbText.Handle).documentView).textStorage.
       removeAttribute_range(NSBackgroundColorAttributeName, rng);
     TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
@@ -2346,6 +2402,7 @@ begin
     iFormSqBracket := -1;
     iFormRnBracket := -1;
     iFormFootnote := -1;
+    iFormInlineNote := -1;
     iParIndent := -1;
     iIdStrike := NSNumber.numberWithInt(NSUnderlineStyleSingle);
     stText := WideString(dbText.Text);
@@ -2404,7 +2461,14 @@ begin
         iFormFootnote := n;
       end
       else
-      if ((iFormSqBracket = -1) and (stText[n] = '[')) then
+      if ((iFormInlineNote = -1) and (stText[n] = '^') and
+        (stText[n + 1] = '[')) then
+      begin
+        iFormInlineNote := n;
+      end
+      else
+      if ((iFormSqBracket = -1) and (stText[n] = '[') and
+        (stText[n - 1] <> '^')) then
       begin
         iFormSqBracket := n;
       end
@@ -2632,6 +2696,19 @@ begin
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
         iFormFootnote := -1;
+      end
+      else
+      if ((stText[n] = ']') and (iFormInlineNote > -1)) then
+      begin
+        rng.location := iFormInlineNote - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clMarker), rng);
+        rng.location := n - 1;
+        rng.length := 1;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clMarker), rng);
+        iFormInlineNote := -1;
       end
       else
       if ((stText[n] = ')') and (iFormRnBracket > -1)) then
@@ -6405,7 +6482,8 @@ procedure TfmMain.FormatListTitles(ListTitles: boolean; FormatText: boolean);
 var
   i, iTab, iPos, iTit1, iTit2, iTit3, iTit4, iTit5, iTit6, iFontSize,
   iParIndent, iFormItalics, iFormBold, iFormStrike, iFormCode,
-  iFormQuote, iFormSqBracket, iFormRnBracket, iFormFootnote, n, iLen, iTryInt: integer;
+  iFormQuote, iFormSqBracket, iFormRnBracket, iFormFootnote, iFormInlineNote,
+  n, iLen, iTryInt: integer;
   stTit: string = '';
   stText: WideString = '';
   rng: NSRange;
@@ -6480,6 +6558,7 @@ begin
     iFormSqBracket := -1;
     iFormRnBracket := -1;
     iFormFootnote := -1;
+    iFormInlineNote := -1;
     iParIndent := -1;
     iIdStrike := NSNumber.numberWithInt(NSUnderlineStyleSingle);
     n := 1;
@@ -6540,7 +6619,14 @@ begin
         iFormFootnote := n;
       end
       else
-      if ((iFormSqBracket = -1) and (stText[n] = '[')) then
+      if ((iFormInlineNote = -1) and (stText[n] = '^') and
+        (stText[n + 1] = '[')) then
+      begin
+        iFormInlineNote := n;
+      end
+      else
+      if ((iFormSqBracket = -1) and (stText[n] = '[') and
+        (stText[n - 1] <> '^')) then
       begin
         iFormSqBracket := n;
       end
@@ -6804,6 +6890,19 @@ begin
         TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
           setTextColor_range(ColorToNSColor(clMarker), rng);
         iFormFootnote := -1;
+      end
+      else
+      if ((stText[n] = ']') and (iFormInlineNote > -1)) then
+      begin
+        rng.location := iFormInlineNote - 1;
+        rng.length := 2;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clMarker), rng);
+        rng.location := n - 1;
+        rng.length := 1;
+        TCocoaTextView(NSScrollView(fmMain.dbText.Handle).documentView).
+          setTextColor_range(ColorToNSColor(clMarker), rng);
+        iFormInlineNote := -1;
       end
       else
       if ((stText[n] = ')') and (iFormRnBracket > -1)) then
@@ -7465,13 +7564,22 @@ begin
   begin
     Exit;
   end;
+  iHeader := -1;
   if i > 0 then
   begin
-    iHeader := StrToNSString(dbText.Text, True).characterAtIndex(i + 1);
+    if ((StrToNSString(dbText.Text, True).characterAtIndex(i + 2) = 9) or
+      (StrToNSString(dbText.Text, True).characterAtIndex(i + 3) = 9)) then
+    begin
+      iHeader := StrToNSString(dbText.Text, True).characterAtIndex(i + 1);
+    end;
   end
   else
   begin
-    iHeader := StrToNSString(dbText.Text, True).characterAtIndex(i);
+    if ((StrToNSString(dbText.Text, True).characterAtIndex(i + 1) = 9) or
+      (StrToNSString(dbText.Text, True).characterAtIndex(i + 2) = 9)) then
+    begin
+      iHeader := StrToNSString(dbText.Text, True).characterAtIndex(i);
+    end;
   end;
   iPos := i + 1;
   if iHeader = 42 then // *
